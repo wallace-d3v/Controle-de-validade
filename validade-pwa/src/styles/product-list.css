@@ -1,0 +1,36 @@
+.lista {
+  margin-top: 16px;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border-left: 6px solid #ccc;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.card button {
+  background: #991b1b;
+  margin-top: 8px;
+}
+
+.vencido {
+  border-left-color: #dc2626;
+}
+
+.hoje {
+  border-left-color: #f97316;
+}
+
+.alerta {
+  border-left-color: #facc15;
+}
+
+.seguro {
+  border-left-color: #22c55e;
+}
