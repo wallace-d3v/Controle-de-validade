@@ -1,5 +1,5 @@
 import { obterStatus } from '../utils/validade'
-import { removerProduto } from '../services/db'
+import { removerProduto } from '../service/db'
 
 export default function ProductList({ produtos, onAtualizar }) {
   async function handleRemover(id) {
