@@ -1,122 +1,79 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from 'react'
 
-function App() {
-  const [count, setCount] = useState(0)
+import './styles/base.css'
+import './styles/layout.css'
+import './styles/buttons.css'
+import './styles/dashboard.css'
+import './styles/form.css'
+import './styles/scanner.css'
+import './styles/product-list.css'
+
+import Scanner from './components/Scanner'
+import ProductForm from './components/ProductForm'
+import ProductList from './components/ProductList'
+import Dashboard from './components/Dashboard'
+
+import { listarProdutos } from './services/db'
+
+export default function App() {
+  const [produtos, setProdutos] = useState([])
+  const [codigoBarras, setCodigoBarras] = useState('')
+  const [mostrarScanner, setMostrarScanner] = useState(false)
+
+  async function carregarProdutos() {
+    const dados = await listarProdutos()
+    setProdutos(dados)
+  }
+
+  useEffect(() => {
+    carregarProdutos()
+  }, [])
+
+  function handleScan(codigo) {
+    setCodigoBarras(codigo)
+    setMostrarScanner(false)
+  }
+
+  function handleProdutoSalvo() {
+    setCodigoBarras('')
+    carregarProdutos()
+    alert('Produto salvo com sucesso.')
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div className="app">
+      <header>
+        <h1>Controle de Validade</h1>
+        <p>PWA para controle de vencimento de produtos</p>
+      </header>
+
+      <Dashboard produtos={produtos} />
+
+      <section className="actions">
+        <button onClick={() => setMostrarScanner(true)}>
+          Escanear produto
+        </button>
+
+        <button onClick={() => setCodigoBarras('MANUAL')}>
+          Cadastrar manualmente
         </button>
       </section>
 
-      <div className="ticks"></div>
+      {mostrarScanner && (
+        <Scanner onScan={handleScan} />
+      )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {codigoBarras && (
+        <ProductForm
+          codigoBarras={codigoBarras}
+          onProdutoSalvo={handleProdutoSalvo}
+        />
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <ProductList
+        produtos={produtos}
+        onAtualizar={carregarProdutos}
+      />
+    </div>
   )
 }
-
-export default App
