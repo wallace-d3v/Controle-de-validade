@@ -13,7 +13,7 @@ import ProductForm from './components/ProductForm'
 import ProductList from './components/ProductList'
 import Dashboard from './components/Dashboard'
 
-import { listarProdutos } from './services/db'
+import { listarProdutos } from './service/db'
 
 export default function App() {
   const [produtos, setProdutos] = useState([])
