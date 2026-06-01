@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { salvarProduto } from '../services/db'
+import { salvarProduto } from '../service/db'
 
 export default function ProductForm({ codigoBarras, onProdutoSalvo }) {
   const [nome, setNome] = useState('')
