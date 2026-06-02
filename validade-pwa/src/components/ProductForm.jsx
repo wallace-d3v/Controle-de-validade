@@ -1,13 +1,55 @@
 import { useState } from 'react'
 import { produtoJaCadastradoComValidade, salvarProduto } from '../service/db'
 
+const TAMANHO_MAXIMO_FOTO = 2 * 1024 * 1024
+
 export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
   const [nome, setNome] = useState('')
   const [validade, setValidade] = useState('')
   const [descricao, setDescricao] = useState('')
   const [quantidade, setQuantidade] = useState(1)
   const [setor, setSetor] = useState('')
+  const [foto, setFoto] = useState('')
   const [mensagemErro, setMensagemErro] = useState('')
+
+  function handleFotoChange(event) {
+    const arquivo = event.target.files?.[0]
+    setMensagemErro('')
+
+    if (!arquivo) {
+      setFoto('')
+      return
+    }
+
+    if (!arquivo.type.startsWith('image/')) {
+      setMensagemErro('Selecione um arquivo de imagem válido.')
+      event.target.value = ''
+      return
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_FOTO) {
+      setMensagemErro('A foto deve ter no máximo 2MB.')
+      event.target.value = ''
+      return
+    }
+
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      setFoto(String(reader.result))
+    }
+
+    reader.onerror = () => {
+      setMensagemErro('Não foi possível carregar a foto do produto.')
+      event.target.value = ''
+    }
+
+    reader.readAsDataURL(arquivo)
+  }
+
+  function removerFoto() {
+    setFoto('')
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -32,6 +74,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
       descricao,
       quantidade: Number(quantidade),
       setor,
+      foto,
       criadoEm: new Date().toISOString()
     }
 
@@ -42,6 +85,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     setDescricao('')
     setQuantidade(1)
     setSetor('')
+    setFoto('')
     setMensagemErro('')
 
     onProdutoSalvo()
@@ -54,6 +98,31 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
           {mensagemErro}
         </div>
       )}
+
+      <div className="form-group">
+        <label>Foto do produto</label>
+
+        <label className="photo-field">
+          {foto ? (
+            <img src={foto} alt="Prévia do produto" />
+          ) : (
+            <span>Adicionar foto</span>
+          )}
+
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFotoChange}
+          />
+        </label>
+
+        {foto && (
+          <button className="button-text photo-remove" type="button" onClick={removerFoto}>
+            Remover foto
+          </button>
+        )}
+      </div>
 
       <div className="form-group">
         <label>Código de barras</label>
