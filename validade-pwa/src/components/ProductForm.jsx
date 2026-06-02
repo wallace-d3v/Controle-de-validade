@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { salvarProduto } from '../service/db'
 
-export default function ProductForm({ codigoBarras, onProdutoSalvo }) {
+export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
   const [nome, setNome] = useState('')
   const [validade, setValidade] = useState('')
   const [descricao, setDescricao] = useState('')
@@ -39,48 +39,76 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo }) {
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <h2>Cadastrar produto</h2>
+      <div className="form-group">
+        <label>Código de barras</label>
+        <div className="input-with-action">
+          <input value={codigoBarras} readOnly />
+          <span>⌗</span>
+        </div>
+      </div>
 
-      <label>Código de barras</label>
-      <input value={codigoBarras} readOnly />
+      <div className="form-group">
+        <label>Nome do produto</label>
+        <input
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          placeholder="Digite o nome do produto"
+        />
+      </div>
 
-      <label>Nome do produto</label>
-      <input
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
-        placeholder="Ex: Leite Integral"
-      />
+      <div className="form-group">
+        <label>Validade</label>
+        <input
+          type="date"
+          value={validade}
+          onChange={(e) => setValidade(e.target.value)}
+        />
+      </div>
 
-      <label>Validade</label>
-      <input
-        type="date"
-        value={validade}
-        onChange={(e) => setValidade(e.target.value)}
-      />
+      <div className="form-group">
+        <label>Setor</label>
+        <select value={setor} onChange={(e) => setSetor(e.target.value)}>
+          <option value="">Selecione o setor</option>
+          <option value="Laticínios">Laticínios</option>
+          <option value="Frios">Frios</option>
+          <option value="Padaria">Padaria</option>
+          <option value="Mercearia">Mercearia</option>
+          <option value="Bebidas">Bebidas</option>
+          <option value="Hortifruti">Hortifruti</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
 
-      <label>Setor</label>
-      <input
-        value={setor}
-        onChange={(e) => setSetor(e.target.value)}
-        placeholder="Ex: Laticínios"
-      />
+      <div className="form-group">
+        <label>Quantidade</label>
+        <div className="quantity-field">
+          <input
+            type="number"
+            min="1"
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
+            placeholder="Informe a quantidade"
+          />
+          <span>un.</span>
+        </div>
+      </div>
 
-      <label>Quantidade</label>
-      <input
-        type="number"
-        min="1"
-        value={quantidade}
-        onChange={(e) => setQuantidade(e.target.value)}
-      />
+      <div className="form-group">
+        <label>Descrição opcional</label>
+        <textarea
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          placeholder="Adicione informações adicionais"
+        />
+      </div>
 
-      <label>Descrição opcional</label>
-      <textarea
-        value={descricao}
-        onChange={(e) => setDescricao(e.target.value)}
-        placeholder="Ex: Caixa 1L"
-      />
+      <button className="button-primary" type="submit">Salvar produto</button>
 
-      <button type="submit">Salvar produto</button>
+      {onCancelar && (
+        <button className="button-text" type="button" onClick={onCancelar}>
+          Cancelar cadastro
+        </button>
+      )}
     </form>
   )
 }
