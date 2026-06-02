@@ -25,6 +25,36 @@
   font-size: 14px;
 }
 
+.photo-field {
+  min-height: 150px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 16px;
+  background: var(--surface-muted);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.photo-field input {
+  display: none;
+}
+
+.photo-field img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-remove {
+  margin-top: 0;
+  padding: 6px 0;
+  color: var(--danger);
+}
+
 .form input,
 .form select,
 .form textarea,
