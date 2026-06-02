@@ -1,31 +1,70 @@
 .form {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 16px;
+  display: grid;
+  gap: 18px;
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
 }
 
 .form label {
-  display: block;
-  margin-top: 12px;
-  font-weight: bold;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .form input,
-.form textarea {
+.form select,
+.form textarea,
+.search-box input {
   width: 100%;
-  padding: 10px;
-  margin-top: 4px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  min-height: 50px;
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 14px;
+  outline: none;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus,
+.search-box input:focus {
+  border-color: var(--primary);
 }
 
 .form textarea {
+  min-height: 92px;
+  padding-top: 14px;
   resize: vertical;
-  min-height: 80px;
 }
 
-.form button {
-  margin-top: 16px;
-  width: 100%;
+.input-with-action,
+.quantity-field {
+  display: grid;
+  grid-template-columns: 1fr 54px;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.input-with-action input,
+.quantity-field input {
+  border: 0;
+  border-radius: 0;
+}
+
+.input-with-action span,
+.quantity-field span {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border-left: 1px solid var(--border);
+  font-weight: 700;
 }
