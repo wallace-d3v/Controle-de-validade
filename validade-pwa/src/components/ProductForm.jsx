@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { salvarProduto } from '../service/db'
+import { produtoJaCadastradoComValidade, salvarProduto } from '../service/db'
 
 export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
   const [nome, setNome] = useState('')
@@ -7,12 +7,21 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
   const [descricao, setDescricao] = useState('')
   const [quantidade, setQuantidade] = useState(1)
   const [setor, setSetor] = useState('')
+  const [mensagemErro, setMensagemErro] = useState('')
 
   async function handleSubmit(event) {
     event.preventDefault()
+    setMensagemErro('')
 
     if (!codigoBarras || !nome || !validade) {
-      alert('Preencha código, nome e validade.')
+      setMensagemErro('Preencha código, nome e validade.')
+      return
+    }
+
+    const jaExiste = await produtoJaCadastradoComValidade(codigoBarras, validade)
+
+    if (jaExiste) {
+      setMensagemErro('Esse produto já foi cadastrado com essa data de validade.')
       return
     }
 
@@ -33,12 +42,19 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     setDescricao('')
     setQuantidade(1)
     setSetor('')
+    setMensagemErro('')
 
     onProdutoSalvo()
   }
 
   return (
     <form className="form" onSubmit={handleSubmit}>
+      {mensagemErro && (
+        <div className="form-alert" role="alert">
+          {mensagemErro}
+        </div>
+      )}
+
       <div className="form-group">
         <label>Código de barras</label>
         <div className="input-with-action">
