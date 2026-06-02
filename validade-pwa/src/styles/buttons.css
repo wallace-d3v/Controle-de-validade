@@ -1,19 +1,68 @@
 button {
-  border: none;
-  background: #111827;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+}
+
+.button-primary,
+.button-secondary,
+.form button[type='submit'],
+.actions-stack button {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid var(--primary);
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.button-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.button-secondary {
+  background: var(--surface);
+  color: var(--primary);
+}
+
+.button-text,
+.section-title button,
+.icon-button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.button-text {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+}
+
+.section-title button {
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
 }
 
 button:hover {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
-@media (max-width: 500px) {
-  button {
-    width: 100%;
-  }
+.actions-stack {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 4px;
 }
