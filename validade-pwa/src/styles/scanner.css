@@ -1,6 +1,16 @@
 .scanner {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
+  background: var(--surface);
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
   margin-bottom: 16px;
+  overflow: hidden;
+}
+
+#reader {
+  width: 100%;
+}
+
+#reader video {
+  border-radius: 12px;
 }
