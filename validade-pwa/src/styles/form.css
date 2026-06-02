@@ -3,6 +3,17 @@
   gap: 18px;
 }
 
+.form-alert {
+  padding: 13px 14px;
+  border-radius: 13px;
+  border: 1px solid var(--danger-bg);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .form-group {
   display: grid;
   gap: 8px;
