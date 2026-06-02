@@ -81,7 +81,13 @@ export default function Dashboard({ produtos, onEscanear, onCadastrarManual, onV
 
               return (
                 <article key={produto.id} className="mini-card">
-                  <div className="product-thumb">{produto.nome.charAt(0).toUpperCase()}</div>
+                  <div className="product-thumb">
+                    {produto.foto ? (
+                      <img src={produto.foto} alt={produto.nome} />
+                    ) : (
+                      produto.nome.charAt(0).toUpperCase()
+                    )}
+                  </div>
                   <div className="mini-card-info">
                     <strong>{produto.nome}</strong>
                     <small>{produto.codigoBarras}</small>
