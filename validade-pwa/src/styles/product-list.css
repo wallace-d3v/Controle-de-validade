@@ -1,36 +1,134 @@
 .lista {
-  margin-top: 16px;
+  display: grid;
+  gap: 14px;
 }
 
-.card {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  border-left: 6px solid #ccc;
+.search-box {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
 }
 
-.card h3 {
-  margin-top: 0;
+.search-box span {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 20px;
 }
 
-.card button {
-  background: #991b1b;
-  margin-top: 8px;
+.search-box input {
+  border: 0;
+  border-radius: 0;
+  padding-left: 0;
 }
 
-.vencido {
-  border-left-color: #dc2626;
+.list-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.hoje {
-  border-left-color: #f97316;
+.product-list {
+  display: grid;
+  gap: 10px;
 }
 
-.alerta {
-  border-left-color: #facc15;
+.product-card {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
-.seguro {
-  border-left-color: #22c55e;
+.product-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.product-info h3 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-info small,
+.product-side small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.product-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  text-align: right;
+}
+
+.product-side button {
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 116px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-badge.vencido {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.status-badge.hoje,
+.status-badge.alerta {
+  color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.status-badge.seguro {
+  color: var(--success);
+  background: var(--success-bg);
+}
+
+@media (max-width: 360px) {
+  .product-card,
+  .mini-card {
+    grid-template-columns: 38px 1fr;
+  }
+
+  .product-side,
+  .mini-card-status {
+    grid-column: 2;
+    align-items: flex-start;
+    text-align: left;
+  }
 }
