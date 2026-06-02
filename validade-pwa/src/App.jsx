@@ -19,6 +19,7 @@ export default function App() {
   const [produtos, setProdutos] = useState([])
   const [codigoBarras, setCodigoBarras] = useState('')
   const [mostrarScanner, setMostrarScanner] = useState(false)
+  const [telaAtual, setTelaAtual] = useState('inicio')
 
   async function carregarProdutos() {
     const dados = await listarProdutos()
@@ -29,6 +30,17 @@ export default function App() {
     carregarProdutos()
   }, [])
 
+  function abrirScanner() {
+    setMostrarScanner(true)
+    setTelaAtual('cadastro')
+  }
+
+  function abrirCadastroManual() {
+    setCodigoBarras('MANUAL')
+    setMostrarScanner(false)
+    setTelaAtual('cadastro')
+  }
+
   function handleScan(codigo) {
     setCodigoBarras(codigo)
     setMostrarScanner(false)
@@ -36,44 +48,106 @@ export default function App() {
 
   function handleProdutoSalvo() {
     setCodigoBarras('')
+    setMostrarScanner(false)
+    setTelaAtual('inicio')
     carregarProdutos()
     alert('Produto salvo com sucesso.')
   }
 
+  function cancelarCadastro() {
+    setCodigoBarras('')
+    setMostrarScanner(false)
+    setTelaAtual('inicio')
+  }
+
   return (
-    <div className="app">
-      <header>
-        <h1>Controle de Validade</h1>
-        <p>PWA para controle de vencimento de produtos</p>
-      </header>
+    <div className="app-shell">
+      <main className="app-screen">
+        {telaAtual === 'inicio' && (
+          <Dashboard
+            produtos={produtos}
+            onEscanear={abrirScanner}
+            onCadastrarManual={abrirCadastroManual}
+            onVerProdutos={() => setTelaAtual('produtos')}
+          />
+        )}
 
-      <Dashboard produtos={produtos} />
+        {telaAtual === 'cadastro' && (
+          <section className="page page-form">
+            <div className="topbar">
+              <button className="icon-button" onClick={cancelarCadastro} aria-label="Voltar">
+                ←
+              </button>
+              <h1>Cadastro de produto</h1>
+              <span className="topbar-space" />
+            </div>
 
-      <section className="actions">
-        <button onClick={() => setMostrarScanner(true)}>
-          Escanear produto
+            {mostrarScanner && (
+              <Scanner onScan={handleScan} />
+            )}
+
+            {!mostrarScanner && !codigoBarras && (
+              <div className="empty-state compact">
+                <strong>Nenhum código informado</strong>
+                <p>Escaneie o produto ou cadastre manualmente.</p>
+                <div className="empty-actions">
+                  <button onClick={abrirScanner}>Escanear produto</button>
+                  <button className="button-secondary" onClick={abrirCadastroManual}>Cadastrar manualmente</button>
+                </div>
+              </div>
+            )}
+
+            {codigoBarras && (
+              <ProductForm
+                codigoBarras={codigoBarras}
+                onProdutoSalvo={handleProdutoSalvo}
+                onCancelar={cancelarCadastro}
+              />
+            )}
+          </section>
+        )}
+
+        {telaAtual === 'produtos' && (
+          <section className="page">
+            <div className="topbar">
+              <span className="topbar-space" />
+              <h1>Produtos</h1>
+              <button className="icon-button" aria-label="Filtrar produtos">⌕</button>
+            </div>
+
+            <ProductList
+              produtos={produtos}
+              onAtualizar={carregarProdutos}
+            />
+          </section>
+        )}
+      </main>
+
+      <nav className="bottom-nav" aria-label="Navegação principal">
+        <button
+          className={telaAtual === 'inicio' ? 'active' : ''}
+          onClick={() => setTelaAtual('inicio')}
+        >
+          <span>⌂</span>
+          Início
         </button>
 
-        <button onClick={() => setCodigoBarras('MANUAL')}>
-          Cadastrar manualmente
+        <button
+          className={telaAtual === 'produtos' ? 'active' : ''}
+          onClick={() => setTelaAtual('produtos')}
+        >
+          <span>☷</span>
+          Produtos
         </button>
-      </section>
 
-      {mostrarScanner && (
-        <Scanner onScan={handleScan} />
-      )}
-
-      {codigoBarras && (
-        <ProductForm
-          codigoBarras={codigoBarras}
-          onProdutoSalvo={handleProdutoSalvo}
-        />
-      )}
-
-      <ProductList
-        produtos={produtos}
-        onAtualizar={carregarProdutos}
-      />
+        <button
+          className={telaAtual === 'cadastro' ? 'active' : ''}
+          onClick={abrirCadastroManual}
+        >
+          <span>＋</span>
+          Cadastro
+        </button>
+      </nav>
     </div>
   )
 }
