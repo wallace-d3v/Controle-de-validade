@@ -57,7 +57,13 @@ export default function ProductList({ produtos, onAtualizar }) {
 
             return (
               <article key={produto.id} className="product-card">
-                <div className="product-thumb">{produto.nome.charAt(0).toUpperCase()}</div>
+                <div className="product-thumb">
+                  {produto.foto ? (
+                    <img src={produto.foto} alt={produto.nome} />
+                  ) : (
+                    produto.nome.charAt(0).toUpperCase()
+                  )}
+                </div>
 
                 <div className="product-info">
                   <h3>{produto.nome}</h3>
