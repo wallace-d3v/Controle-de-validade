@@ -27,6 +27,17 @@ export async function listarProdutos() {
   return db.getAll(STORE_NAME)
 }
 
+export async function produtoJaCadastradoComValidade(codigoBarras, validade) {
+  const produtos = await listarProdutos()
+
+  return produtos.some((produto) => {
+    return (
+      String(produto.codigoBarras).trim() === String(codigoBarras).trim() &&
+      produto.validade === validade
+    )
+  })
+}
+
 export async function removerProduto(id) {
   const db = await getDB()
   return db.delete(STORE_NAME, id)
