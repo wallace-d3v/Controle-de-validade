@@ -22,6 +22,11 @@ export async function salvarProduto(produto) {
   return db.add(STORE_NAME, produto)
 }
 
+export async function atualizarProduto(produto) {
+  const db = await getDB()
+  return db.put(STORE_NAME, produto)
+}
+
 export async function listarProdutos() {
   const db = await getDB()
   return db.getAll(STORE_NAME)
