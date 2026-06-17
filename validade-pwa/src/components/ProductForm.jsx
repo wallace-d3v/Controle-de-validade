@@ -1,7 +1,9 @@
-import { useState } from 'react'
-import { produtoJaCadastradoComValidade, salvarProduto } from '../service/db'
-
-const TAMANHO_MAXIMO_FOTO = 2 * 1024 * 1024
+import { useEffect, useState } from 'react'
+import {
+  buscarProdutoPorCodigoBarras,
+  produtoJaCadastradoComValidade,
+  salvarProduto
+} from '../service/db'
 
 export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
   const [nome, setNome] = useState('')
@@ -11,6 +13,23 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
   const [setor, setSetor] = useState('')
   const [foto, setFoto] = useState('')
   const [mensagemErro, setMensagemErro] = useState('')
+
+  useEffect(() => {
+    async function preencherProdutoSalvo() {
+      if (!codigoBarras) return
+
+      const produtoSalvo = await buscarProdutoPorCodigoBarras(codigoBarras)
+
+      if (!produtoSalvo) return
+
+      setNome(produtoSalvo.nome || '')
+      setSetor(produtoSalvo.setor || '')
+      setDescricao(produtoSalvo.descricao || '')
+      setFoto(produtoSalvo.foto || '')
+    }
+
+    preencherProdutoSalvo()
+  }, [codigoBarras])
 
   function handleFotoChange(event) {
     const arquivo = event.target.files?.[0]
@@ -23,12 +42,6 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
 
     if (!arquivo.type.startsWith('image/')) {
       setMensagemErro('Selecione um arquivo de imagem válido.')
-      event.target.value = ''
-      return
-    }
-
-    if (arquivo.size > TAMANHO_MAXIMO_FOTO) {
-      setMensagemErro('A foto deve ter no máximo 2MB.')
       event.target.value = ''
       return
     }
