@@ -22,6 +22,11 @@ export async function salvarProduto(produto) {
   return db.add(STORE_NAME, produto)
 }
 
+export async function atualizarProduto(produto) {
+  const db = await getDB()
+  return db.put(STORE_NAME, produto)
+}
+
 export async function listarProdutos() {
   const db = await getDB()
   return db.getAll(STORE_NAME)
@@ -38,11 +43,12 @@ export async function buscarProdutoPorCodigoBarras(codigoBarras) {
   return produtosComMesmoCodigo.at(-1) || null
 }
 
-export async function produtoJaCadastradoComValidade(codigoBarras, validade) {
+export async function produtoJaCadastradoComValidade(codigoBarras, validade, idIgnorado = null) {
   const produtos = await listarProdutos()
 
   return produtos.some((produto) => {
     return (
+      produto.id !== idIgnorado &&
       String(produto.codigoBarras).trim() === String(codigoBarras).trim() &&
       produto.validade === validade
     )

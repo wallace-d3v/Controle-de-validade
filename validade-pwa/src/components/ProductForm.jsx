@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  atualizarProduto,
   buscarProdutoPorCodigoBarras,
   produtoJaCadastradoComValidade,
   salvarProduto
@@ -17,6 +18,16 @@ function formatarValidadeDigitada(valor) {
   }
 
   return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`
+}
+
+function formatarValidadeISO(valor) {
+  if (!valor) return ''
+
+  const [ano, mes, dia] = valor.split('-')
+
+  if (!ano || !mes || !dia) return ''
+
+  return `${dia}/${mes}/${ano}`
 }
 
 function converterValidadeParaISO(valor) {
@@ -43,7 +54,8 @@ function converterValidadeParaISO(valor) {
   return `${ano}-${mes}-${dia}`
 }
 
-export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
+export default function ProductForm({ codigoBarras, produtoEmEdicao, onProdutoSalvo, onCancelar }) {
+  const editando = Boolean(produtoEmEdicao)
   const [nome, setNome] = useState('')
   const [validade, setValidade] = useState('')
   const [descricao, setDescricao] = useState('')
@@ -53,8 +65,19 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
   const [mensagemErro, setMensagemErro] = useState('')
 
   useEffect(() => {
+    if (!produtoEmEdicao) return
+
+    setNome(produtoEmEdicao.nome || '')
+    setValidade(formatarValidadeISO(produtoEmEdicao.validade))
+    setDescricao(produtoEmEdicao.descricao || '')
+    setQuantidade(produtoEmEdicao.quantidade || 1)
+    setSetor(produtoEmEdicao.setor || '')
+    setFoto(produtoEmEdicao.foto || '')
+  }, [produtoEmEdicao])
+
+  useEffect(() => {
     async function preencherProdutoSalvo() {
-      if (!codigoBarras) return
+      if (editando || !codigoBarras) return
 
       const produtoSalvo = await buscarProdutoPorCodigoBarras(codigoBarras)
 
@@ -67,7 +90,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     }
 
     preencherProdutoSalvo()
-  }, [codigoBarras])
+  }, [codigoBarras, editando])
 
   function handleFotoChange(event) {
     const arquivo = event.target.files?.[0]
@@ -111,13 +134,18 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     setMensagemErro('')
 
     const validadeISO = converterValidadeParaISO(validade)
+    const codigoAtual = produtoEmEdicao?.codigoBarras || codigoBarras
 
-    if (!codigoBarras || !nome || !validadeISO) {
+    if (!codigoAtual || !nome || !validadeISO) {
       setMensagemErro('Preencha código, nome e uma validade válida no formato DD/MM/AAAA.')
       return
     }
 
-    const jaExiste = await produtoJaCadastradoComValidade(codigoBarras, validadeISO)
+    const jaExiste = await produtoJaCadastradoComValidade(
+      codigoAtual,
+      validadeISO,
+      produtoEmEdicao?.id || null
+    )
 
     if (jaExiste) {
       setMensagemErro('Esse produto já foi cadastrado com essa data de validade.')
@@ -125,17 +153,23 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     }
 
     const produto = {
-      codigoBarras,
+      ...produtoEmEdicao,
+      codigoBarras: codigoAtual,
       nome,
       validade: validadeISO,
       descricao,
       quantidade: Number(quantidade),
       setor,
       foto,
-      criadoEm: new Date().toISOString()
+      atualizadoEm: new Date().toISOString(),
+      criadoEm: produtoEmEdicao?.criadoEm || new Date().toISOString()
     }
 
-    await salvarProduto(produto)
+    if (editando) {
+      await atualizarProduto(produto)
+    } else {
+      await salvarProduto(produto)
+    }
 
     setNome('')
     setValidade('')
@@ -145,7 +179,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     setFoto('')
     setMensagemErro('')
 
-    onProdutoSalvo()
+    onProdutoSalvo(editando)
   }
 
   return (
@@ -184,7 +218,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
       <div className="form-group">
         <label>Código de barras</label>
         <div className="input-with-action">
-          <input value={codigoBarras} readOnly />
+          <input value={produtoEmEdicao?.codigoBarras || codigoBarras} readOnly />
           <span>⌗</span>
         </div>
       </div>
@@ -247,11 +281,13 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
         />
       </div>
 
-      <button className="button-primary" type="submit">Salvar produto</button>
+      <button className="button-primary" type="submit">
+        {editando ? 'Salvar alterações' : 'Salvar produto'}
+      </button>
 
       {onCancelar && (
         <button className="button-text" type="button" onClick={onCancelar}>
-          Cancelar cadastro
+          {editando ? 'Cancelar edição' : 'Cancelar cadastro'}
         </button>
       )}
     </form>

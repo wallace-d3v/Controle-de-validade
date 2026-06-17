@@ -18,6 +18,7 @@ import { listarProdutos } from './service/db'
 export default function App() {
   const [produtos, setProdutos] = useState([])
   const [codigoBarras, setCodigoBarras] = useState('')
+  const [produtoEmEdicao, setProdutoEmEdicao] = useState(null)
   const [mostrarScanner, setMostrarScanner] = useState(false)
   const [telaAtual, setTelaAtual] = useState('inicio')
 
@@ -31,12 +32,21 @@ export default function App() {
   }, [])
 
   function abrirScanner() {
+    setProdutoEmEdicao(null)
     setMostrarScanner(true)
     setTelaAtual('cadastro')
   }
 
   function abrirCadastroManual() {
+    setProdutoEmEdicao(null)
     setCodigoBarras('MANUAL')
+    setMostrarScanner(false)
+    setTelaAtual('cadastro')
+  }
+
+  function abrirEdicaoProduto(produto) {
+    setProdutoEmEdicao(produto)
+    setCodigoBarras(produto.codigoBarras)
     setMostrarScanner(false)
     setTelaAtual('cadastro')
   }
@@ -46,16 +56,18 @@ export default function App() {
     setMostrarScanner(false)
   }
 
-  function handleProdutoSalvo() {
+  function handleProdutoSalvo(editando = false) {
     setCodigoBarras('')
+    setProdutoEmEdicao(null)
     setMostrarScanner(false)
-    setTelaAtual('inicio')
+    setTelaAtual(editando ? 'produtos' : 'inicio')
     carregarProdutos()
-    alert('Produto salvo com sucesso.')
+    alert(editando ? 'Produto atualizado com sucesso.' : 'Produto salvo com sucesso.')
   }
 
   function cancelarCadastro() {
     setCodigoBarras('')
+    setProdutoEmEdicao(null)
     setMostrarScanner(false)
     setTelaAtual('inicio')
   }
@@ -78,7 +90,7 @@ export default function App() {
               <button className="icon-button" onClick={cancelarCadastro} aria-label="Voltar">
                 ←
               </button>
-              <h1>Cadastro de produto</h1>
+              <h1>{produtoEmEdicao ? 'Editar produto' : 'Cadastro de produto'}</h1>
               <span className="topbar-space" />
             </div>
 
@@ -86,7 +98,7 @@ export default function App() {
               <Scanner onScan={handleScan} />
             )}
 
-            {!mostrarScanner && !codigoBarras && (
+            {!mostrarScanner && !codigoBarras && !produtoEmEdicao && (
               <div className="empty-state compact">
                 <strong>Nenhum código informado</strong>
                 <p>Escaneie o produto ou cadastre manualmente.</p>
@@ -97,9 +109,10 @@ export default function App() {
               </div>
             )}
 
-            {codigoBarras && (
+            {(codigoBarras || produtoEmEdicao) && (
               <ProductForm
                 codigoBarras={codigoBarras}
+                produtoEmEdicao={produtoEmEdicao}
                 onProdutoSalvo={handleProdutoSalvo}
                 onCancelar={cancelarCadastro}
               />
@@ -118,6 +131,7 @@ export default function App() {
             <ProductList
               produtos={produtos}
               onAtualizar={carregarProdutos}
+              onEditarProduto={abrirEdicaoProduto}
             />
           </section>
         )}
