@@ -27,6 +27,17 @@ export async function listarProdutos() {
   return db.getAll(STORE_NAME)
 }
 
+export async function buscarProdutoPorCodigoBarras(codigoBarras) {
+  const produtos = await listarProdutos()
+  const codigoNormalizado = String(codigoBarras).trim()
+
+  const produtosComMesmoCodigo = produtos.filter((produto) => {
+    return String(produto.codigoBarras).trim() === codigoNormalizado
+  })
+
+  return produtosComMesmoCodigo.at(-1) || null
+}
+
 export async function produtoJaCadastradoComValidade(codigoBarras, validade) {
   const produtos = await listarProdutos()
 
