@@ -43,11 +43,12 @@ export async function buscarProdutoPorCodigoBarras(codigoBarras) {
   return produtosComMesmoCodigo.at(-1) || null
 }
 
-export async function produtoJaCadastradoComValidade(codigoBarras, validade) {
+export async function produtoJaCadastradoComValidade(codigoBarras, validade, idIgnorado = null) {
   const produtos = await listarProdutos()
 
   return produtos.some((produto) => {
     return (
+      produto.id !== idIgnorado &&
       String(produto.codigoBarras).trim() === String(codigoBarras).trim() &&
       produto.validade === validade
     )
