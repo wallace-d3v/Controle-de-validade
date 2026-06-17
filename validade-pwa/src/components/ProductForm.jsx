@@ -5,6 +5,44 @@ import {
   salvarProduto
 } from '../service/db'
 
+function formatarValidadeDigitada(valor) {
+  const numeros = valor.replace(/\D/g, '').slice(0, 8)
+
+  if (numeros.length <= 2) {
+    return numeros
+  }
+
+  if (numeros.length <= 4) {
+    return `${numeros.slice(0, 2)}/${numeros.slice(2)}`
+  }
+
+  return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`
+}
+
+function converterValidadeParaISO(valor) {
+  const numeros = valor.replace(/\D/g, '')
+
+  if (numeros.length !== 8) {
+    return null
+  }
+
+  const dia = numeros.slice(0, 2)
+  const mes = numeros.slice(2, 4)
+  const ano = numeros.slice(4, 8)
+  const data = new Date(Number(ano), Number(mes) - 1, Number(dia))
+
+  const dataValida =
+    data.getFullYear() === Number(ano) &&
+    data.getMonth() === Number(mes) - 1 &&
+    data.getDate() === Number(dia)
+
+  if (!dataValida) {
+    return null
+  }
+
+  return `${ano}-${mes}-${dia}`
+}
+
 export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }) {
   const [nome, setNome] = useState('')
   const [validade, setValidade] = useState('')
@@ -60,6 +98,10 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     reader.readAsDataURL(arquivo)
   }
 
+  function handleValidadeChange(event) {
+    setValidade(formatarValidadeDigitada(event.target.value))
+  }
+
   function removerFoto() {
     setFoto('')
   }
@@ -68,12 +110,14 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     event.preventDefault()
     setMensagemErro('')
 
-    if (!codigoBarras || !nome || !validade) {
-      setMensagemErro('Preencha código, nome e validade.')
+    const validadeISO = converterValidadeParaISO(validade)
+
+    if (!codigoBarras || !nome || !validadeISO) {
+      setMensagemErro('Preencha código, nome e uma validade válida no formato DD/MM/AAAA.')
       return
     }
 
-    const jaExiste = await produtoJaCadastradoComValidade(codigoBarras, validade)
+    const jaExiste = await produtoJaCadastradoComValidade(codigoBarras, validadeISO)
 
     if (jaExiste) {
       setMensagemErro('Esse produto já foi cadastrado com essa data de validade.')
@@ -83,7 +127,7 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
     const produto = {
       codigoBarras,
       nome,
-      validade,
+      validade: validadeISO,
       descricao,
       quantidade: Number(quantidade),
       setor,
@@ -157,9 +201,12 @@ export default function ProductForm({ codigoBarras, onProdutoSalvo, onCancelar }
       <div className="form-group">
         <label>Validade</label>
         <input
-          type="date"
+          type="text"
+          inputMode="numeric"
           value={validade}
-          onChange={(e) => setValidade(e.target.value)}
+          onChange={handleValidadeChange}
+          placeholder="DD/MM/AAAA"
+          maxLength="10"
         />
       </div>
 
