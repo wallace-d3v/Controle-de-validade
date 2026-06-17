@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { obterStatus } from '../utils/validade'
 import { removerProduto } from '../service/db'
 
-export default function ProductList({ produtos, onAtualizar }) {
+export default function ProductList({ produtos, onAtualizar, onEditarProduto }) {
   const [busca, setBusca] = useState('')
+  const [imagemAberta, setImagemAberta] = useState(null)
 
   const produtosFiltrados = useMemo(() => {
     return produtos
@@ -20,13 +21,26 @@ export default function ProductList({ produtos, onAtualizar }) {
       .sort((a, b) => new Date(a.validade) - new Date(b.validade))
   }, [produtos, busca])
 
-  async function handleRemover(id) {
+  async function handleRemover(event, id) {
+    event.stopPropagation()
+
     const confirmar = confirm('Deseja remover este produto?')
 
     if (!confirmar) return
 
     await removerProduto(id)
     onAtualizar()
+  }
+
+  function abrirImagem(event, produto) {
+    event.stopPropagation()
+
+    if (!produto.foto) return
+
+    setImagemAberta({
+      src: produto.foto,
+      alt: produto.nome
+    })
   }
 
   return (
@@ -56,8 +70,18 @@ export default function ProductList({ produtos, onAtualizar }) {
             const status = obterStatus(produto.validade)
 
             return (
-              <article key={produto.id} className="product-card">
-                <div className="product-thumb">
+              <article
+                key={produto.id}
+                className="product-card"
+                onClick={() => onEditarProduto(produto)}
+                role="button"
+                tabIndex="0"
+              >
+                <div
+                  className={produto.foto ? 'product-thumb product-thumb-clickable' : 'product-thumb'}
+                  onClick={(event) => abrirImagem(event, produto)}
+                  title={produto.foto ? 'Visualizar imagem' : undefined}
+                >
                   {produto.foto ? (
                     <img src={produto.foto} alt={produto.nome} />
                   ) : (
@@ -74,13 +98,28 @@ export default function ProductList({ produtos, onAtualizar }) {
                 <div className="product-side">
                   <span className={`status-badge ${status.classe}`}>{status.texto}</span>
                   <small>{produto.validade}</small>
-                  <button onClick={() => handleRemover(produto.id)} aria-label="Remover produto">
+                  <button onClick={(event) => handleRemover(event, produto.id)} aria-label="Remover produto">
                     Remover
                   </button>
                 </div>
               </article>
             )
           })}
+        </div>
+      )}
+
+      {imagemAberta && (
+        <div className="image-viewer" onClick={() => setImagemAberta(null)}>
+          <div className="image-viewer-content" onClick={(event) => event.stopPropagation()}>
+            <button
+              className="image-viewer-close"
+              onClick={() => setImagemAberta(null)}
+              aria-label="Fechar imagem"
+            >
+              ×
+            </button>
+            <img src={imagemAberta.src} alt={imagemAberta.alt} />
+          </div>
         </div>
       )}
     </div>
